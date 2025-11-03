@@ -1,0 +1,127 @@
+warning: in the working copy of 'src/app/payment/page.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/app/payment/page.tsx b/src/app/payment/page.tsx[m
+[1mindex f4fc3f6..29d0743 100644[m
+[1m--- a/src/app/payment/page.tsx[m
+[1m+++ b/src/app/payment/page.tsx[m
+[36m@@ -5,7 +5,9 @@[m [mimport { useSearchParams } from "next/navigation";[m
+ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";[m
+ import { Button } from "@/components/ui/button";[m
+ import { Badge } from "@/components/ui/badge";[m
+[31m-import { Check, Lock, Loader2 } from "lucide-react";[m
+[32m+[m[32mimport { Check, Lock, Loader2, Tag } from "lucide-react";[m
+[32m+[m[32mimport { Input } from "@/components/ui/input";[m
+[32m+[m[32mimport { Label } from "@/components/ui/label";[m
+ import { Breadcrumbs } from "@/components/breadcrumbs";[m
+ import { db } from "@/lib/firebase";[m
+ import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";[m
+[36m@@ -24,6 +26,8 @@[m [mexport default function PaymentPage() {[m
+   const [community, setCommunity] = useState<any>(null);[m
+   const [loading, setLoading] = useState(true);[m
+   const [processing, setProcessing] = useState(false);[m
+[32m+[m[32m  const [promoCodeInput, setPromoCodeInput] = useState("");[m
+[32m+[m[32m  const [appliedDiscount, setAppliedDiscount] = useState<number>(0);[m
+ [m
+   useEffect(() => {[m
+     (async () => {[m
+[36m@@ -43,6 +47,7 @@[m [mexport default function PaymentPage() {[m
+           // Fetch community[m
+           const commDoc = await getDoc(doc(db, "platforms", p.id as string, "communities", communityId));[m
+           const comm = commDoc.exists() ? ({ id: commDoc.id, ...commDoc.data() } as any) : null;[m
+[32m+[m[32m          console.log("Loaded community:", comm); // Debug log[m
+           setCommunity(comm);[m
+         }[m
+       } catch (e) {[m
+[36m@@ -129,9 +134,64 @@[m [mexport default function PaymentPage() {[m
+                 <span className="text-sm">Priority support</span>[m
+               </div>[m
+             </div>[m
+[32m+[m[32m            {community.monthlyPrice && community.monthlyPrice > 0 && ([m
+[32m+[m[32m              <div className="pt-3 border-t">[m
+[32m+[m[32m                <p className="text-lg font-semibold text-right">[m
+[32m+[m[32m                  Rp {community.monthlyPrice.toLocaleString('id-ID')}[m
+[32m+[m[32m                  <span className="text-sm text-muted-foreground font-normal"> /month</span>[m
+[32m+[m[32m                </p>[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m            )}[m
+           </div>[m
+ [m
+           <div className="pt-6 border-t space-y-4">[m
+[32m+[m[32m            {community.promoCode && ([m
+[32m+[m[32m              <div className="space-y-2">[m
+[32m+[m[32m                <Label>Have a promo code?</Label>[m
+[32m+[m[32m                <div className="flex items-center gap-2">[m
+[32m+[m[32m                  <Input[m[41m [m
+[32m+[m[32m                    value={promoCodeInput}[m[41m [m
+[32m+[m[32m                    onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}[m
+[32m+[m[32m                    placeholder="Enter promo code"[m
+[32m+[m[32m                    maxLength={4}[m
+[32m+[m[32m                  />[m
+[32m+[m[32m                  <Button[m
+[32m+[m[32m                    variant="outline"[m
+[32m+[m[32m                    onClick={() => {[m
+[32m+[m[32m                      if (!promoCodeInput.trim()) {[m
+[32m+[m[32m                        toast.error("Please enter a promo code");[m
+[32m+[m[32m                        return;[m
+[32m+[m[32m                      }[m
+[32m+[m[32m                      console.log("Comparing:", promoCodeInput.trim().toUpperCase(), "vs", community.promoCode?.toUpperCase());[m
+[32m+[m[32m                      if (promoCodeInput.trim().toUpperCase() === community.promoCode?.toUpperCase()) {[m
+[32m+[m[32m                        const basePrice = community.monthlyPrice || 2999000;[m
+[32m+[m[32m                        let discount = 0;[m
+[32m+[m[32m                        if (community.discountType === "percentage") {[m
+[32m+[m[32m                          discount = Math.round((basePrice * community.discountAmount) / 100);[m
+[32m+[m[32m                        } else {[m
+[32m+[m[32m                          discount = community.discountAmount;[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                        setAppliedDiscount(discount);[m
+[32m+[m[32m                        toast.success(`Promo code applied! Discount: Rp ${discount.toLocaleString('id-ID')}`);[m
+[32m+[m[32m                      } else {[m
+[32m+[m[32m                        console.log("Invalid promo code - expected:", community.promoCode, "got:", promoCodeInput);[m
+[32m+[m[32m                        toast.error("Invalid promo code");[m
+[32m+[m[32m                      }[m
+[32m+[m[32m                    }}[m
+[32m+[m[32m                  >[m
+[32m+[m[32m                    <Tag className="h-4 w-4 mr-2" />[m
+[32m+[m[32m                    Apply[m
+[32m+[m[32m                  </Button>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m            )}[m
+[32m+[m[32m            {appliedDiscount > 0 && ([m
+[32m+[m[32m              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">[m
+[32m+[m[32m                <p className="text-sm text-green-800">[m
+[32m+[m[32m                  Discount applied: <strong>-Rp {appliedDiscount.toLocaleString('id-ID')}</strong>[m
+[32m+[m[32m                </p>[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m            )}[m
+             <div className="pt-4">[m
+               <Button [m
+                 size="lg" [m
+[36m@@ -145,6 +205,10 @@[m [mexport default function PaymentPage() {[m
+ [m
+                   setProcessing(true);[m
+                   try {[m
+[32m+[m[32m                    // Calculate final amount with discount[m
+[32m+[m[32m                    const basePrice = community.monthlyPrice || 2999000;[m
+[32m+[m[32m                    const finalAmount = Math.max(0, basePrice - appliedDiscount);[m
+[32m+[m[41m                    [m
+                     // Get Snap token from API[m
+                     const response = await fetch("/api/payment/snap-token", {[m
+                       method: "POST",[m
+[36m@@ -157,7 +221,7 @@[m [mexport default function PaymentPage() {[m
+                         userId: user.id,[m
+                         userName: user.name,[m
+                         userEmail: user.email,[m
+[31m-                        amount: 2999000, // 29.99 USD in cents[m
+[32m+[m[32m                        amount: finalAmount,[m
+                       }),[m
+                     });[m
+ [m
+[36m@@ -213,7 +277,7 @@[m [mexport default function PaymentPage() {[m
+                     Processing...[m
+                   </>[m
+                 ) : ([m
+[31m-                  "Complete Payment • Rp 29.990.000"[m
+[32m+[m[32m                  `Complete Payment • Rp ${(Math.max(0, (community.monthlyPrice || 2999000) - appliedDiscount)).toLocaleString('id-ID')}`[m
+                 )}[m
+               </Button>[m
+               <p className="text-xs text-center text-muted-foreground mt-2">[m

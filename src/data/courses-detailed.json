@@ -1,0 +1,200 @@
+[
+  {
+    "id": "course_nextjs",
+    "title": "Next.js Fundamentals",
+    "description": "Master the fundamentals of Next.js and build modern React applications with server-side rendering, routing, and API routes.",
+    "level": "Beginner",
+    "communityId": "c_react",
+    "instructor": "Sarah Johnson",
+    "duration": "4h 30m",
+    "totalLessons": 14,
+    "sections": [
+      {
+        "id": "section_1",
+        "title": "Getting Started",
+        "lessons": [
+          {
+            "id": "lesson_1",
+            "title": "Introduction to Next.js",
+            "type": "video",
+            "duration": "12:30",
+            "videoUrl": "https://example.com/video1.mp4",
+            "transcript": "Welcome to Next.js Fundamentals. In this course, you'll learn how to build modern web applications using Next.js...",
+            "order": 1
+          },
+          {
+            "id": "lesson_2",
+            "title": "Setting Up Your Development Environment",
+            "type": "article",
+            "duration": "8 min read",
+            "content": "Before we dive into Next.js, let's set up your development environment. First, make sure you have Node.js installed. You can check by running `node --version` in your terminal. Next, install Next.js globally using npm...",
+            "order": 2
+          },
+          {
+            "id": "lesson_3",
+            "title": "Next.js Basics Quiz",
+            "type": "quiz",
+            "duration": "5 min",
+            "questions": [
+              {
+                "id": "q1",
+                "question": "What is Next.js primarily used for?",
+                "options": [
+                  "Building mobile applications",
+                  "Building React-based web applications with SSR",
+                  "Database management",
+                  "API development only"
+                ],
+                "correctAnswer": 1
+              },
+              {
+                "id": "q2",
+                "question": "Which command is used to create a new Next.js project?",
+                "options": [
+                  "next create",
+                  "npx create-next-app",
+                  "npm install next",
+                  "create-react-app"
+                ],
+                "correctAnswer": 1
+              }
+            ],
+            "order": 3
+          }
+        ]
+      },
+      {
+        "id": "section_2",
+        "title": "Routing and Navigation",
+        "lessons": [
+          {
+            "id": "lesson_4",
+            "title": "Understanding File-Based Routing",
+            "type": "video",
+            "duration": "15:45",
+            "videoUrl": "https://example.com/video2.mp4",
+            "transcript": "Next.js uses a file-based routing system. This means that the structure of your files determines the routes in your application...",
+            "order": 4
+          },
+          {
+            "id": "lesson_5",
+            "title": "Dynamic Routes Explained",
+            "type": "article",
+            "duration": "10 min read",
+            "content": "Dynamic routes allow you to create pages with variable segments. For example, if you create a file named `[id].js` in your pages directory, it will match any route like `/posts/123` or `/posts/456`...",
+            "order": 5
+          },
+          {
+            "id": "lesson_6",
+            "title": "Navigation Quiz",
+            "type": "quiz",
+            "duration": "5 min",
+            "questions": [
+              {
+                "id": "q3",
+                "question": "How do you create a dynamic route in Next.js?",
+                "options": [
+                  "Using brackets in the filename: [id].js",
+                  "Using curly braces: {id}.js",
+                  "Using query parameters only",
+                  "Dynamic routes are not supported"
+                ],
+                "correctAnswer": 0
+              }
+            ],
+            "order": 6
+          }
+        ]
+      },
+      {
+        "id": "section_3",
+        "title": "Data Fetching",
+        "lessons": [
+          {
+            "id": "lesson_7",
+            "title": "getServerSideProps Deep Dive",
+            "type": "video",
+            "duration": "18:20",
+            "videoUrl": "https://example.com/video3.mp4",
+            "transcript": "Server-side rendering is one of Next.js's key features. The getServerSideProps function allows you to fetch data on the server before rendering...",
+            "order": 7
+          },
+          {
+            "id": "lesson_8",
+            "title": "Static Site Generation with getStaticProps",
+            "type": "article",
+            "duration": "12 min read",
+            "content": "Static Site Generation (SSG) is a powerful feature that allows you to pre-render pages at build time. This results in faster page loads and better SEO...",
+            "order": 8
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "course_ml101",
+    "title": "Machine Learning 101",
+    "description": "An introduction to machine learning concepts, algorithms, and practical applications.",
+    "level": "Beginner",
+    "communityId": "c_job",
+    "instructor": "Dr. Michael Chen",
+    "duration": "6h 15m",
+    "totalLessons": 10,
+    "sections": [
+      {
+        "id": "section_1",
+        "title": "Introduction to ML",
+        "lessons": [
+          {
+            "id": "lesson_1",
+            "title": "What is Machine Learning?",
+            "type": "video",
+            "duration": "20:15",
+            "videoUrl": "https://example.com/ml-video1.mp4",
+            "transcript": "Machine learning is a subset of artificial intelligence that enables systems to learn from data...",
+            "order": 1
+          },
+          {
+            "id": "lesson_2",
+            "title": "Types of Machine Learning",
+            "type": "article",
+            "duration": "15 min read",
+            "content": "There are three main types of machine learning: supervised learning, unsupervised learning, and reinforcement learning...",
+            "order": 2
+          },
+          {
+            "id": "lesson_3",
+            "title": "ML Fundamentals Quiz",
+            "type": "quiz",
+            "duration": "8 min",
+            "questions": [
+              {
+                "id": "q1",
+                "question": "Which type of machine learning uses labeled data?",
+                "options": [
+                  "Unsupervised Learning",
+                  "Supervised Learning",
+                  "Reinforcement Learning",
+                  "Deep Learning"
+                ],
+                "correctAnswer": 1
+              },
+              {
+                "id": "q2",
+                "question": "What is the process of training a model called?",
+                "options": [
+                  "Testing",
+                  "Training",
+                  "Deployment",
+                  "Validation"
+                ],
+                "correctAnswer": 1
+              }
+            ],
+            "order": 3
+          }
+        ]
+      }
+    ]
+  }
+]

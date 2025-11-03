@@ -1,0 +1,32 @@
+[
+  {
+    "id": "course_va_fundamentals",
+    "title": "Virtual Assistant Fundamentals",
+    "level": "Beginner",
+    "lessons": 10,
+    "communityId": "c_va"
+  },
+  {
+    "id": "course_va_tools",
+    "title": "Essential VA Tools & Software",
+    "level": "Beginner",
+    "lessons": 7,
+    "communityId": "c_va"
+  },
+  {
+    "id": "course_va_client_management",
+    "title": "Client Management & Communication",
+    "level": "Intermediate",
+    "lessons": 9,
+    "communityId": "c_va"
+  },
+  {
+    "id": "course_va_automation",
+    "title": "Workflow Automation for VAs",
+    "level": "Intermediate",
+    "lessons": 11,
+    "communityId": "c_va"
+  }
+]
+
+

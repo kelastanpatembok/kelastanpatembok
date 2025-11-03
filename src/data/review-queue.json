@@ -1,0 +1,46 @@
+[
+  {
+    "id": "rq_1",
+    "type": "post",
+    "status": "pending",
+    "priority": "normal",
+    "platformId": "pf_rwid",
+    "authorId": "u_member",
+    "authorName": "Member Mia",
+    "communityId": "c_react",
+    "communityName": "ReactJS",
+    "title": "Tips for your first remote standup",
+    "excerpt": "Keep it short, list blockers, and share one learning from yesterday...",
+    "submittedAt": "2025-10-10T08:00:00Z"
+  },
+  {
+    "id": "rq_2",
+    "type": "comment",
+    "status": "pending",
+    "priority": "high",
+    "platformId": "pf_rwid",
+    "authorId": "u_visitor",
+    "authorName": "Visitor Violet",
+    "communityId": "c_job",
+    "communityName": "Job Hunting",
+    "title": "Is 3 projects enough for a junior portfolio?",
+    "excerpt": "I have a landing page, a CRUD app, and a small API. Should I add more?",
+    "submittedAt": "2025-10-11T12:30:00Z"
+  },
+  {
+    "id": "rq_3",
+    "type": "lesson",
+    "status": "pending",
+    "priority": "normal",
+    "platformId": "pf_rwid",
+    "authorId": "u_member",
+    "authorName": "Member Mia",
+    "communityId": "c_portfolio",
+    "communityName": "Portofolio & Branding",
+    "title": "Crafting a compelling About Me",
+    "excerpt": "Start with your mission, show a problem you love solving, and humanize it...",
+    "submittedAt": "2025-10-12T09:00:00Z"
+  }
+]
+
+

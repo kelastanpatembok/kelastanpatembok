@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle with bright lime green outline -->
+  <circle cx="50" cy="50" r="48" fill="white" stroke="#00FF00" stroke-width="4"/>
+  
+  <!-- Hour markers (8 rectangular markers in salmon color, evenly distributed) -->
+  <!-- 12 o'clock -->
+  <rect x="46" y="6" width="8" height="6" fill="#FA8072" rx="1"/>
+  <!-- 3 o'clock -->
+  <rect x="88" y="46" width="6" height="8" fill="#FA8072" rx="1"/>
+  <!-- 6 o'clock -->
+  <rect x="46" y="88" width="8" height="6" fill="#FA8072" rx="1"/>
+  <!-- 9 o'clock -->
+  <rect x="6" y="46" width="6" height="8" fill="#FA8072" rx="1"/>
+  <!-- 1:30 (45 degrees) -->
+  <rect x="68.28" y="11.72" width="6" height="8" fill="#FA8072" rx="1" transform="rotate(45 71.28 15.72)"/>
+  <!-- 4:30 (135 degrees) -->
+  <rect x="68.28" y="80.28" width="6" height="8" fill="#FA8072" rx="1" transform="rotate(-45 71.28 84.28)"/>
+  <!-- 7:30 (225 degrees) -->
+  <rect x="25.72" y="80.28" width="6" height="8" fill="#FA8072" rx="1" transform="rotate(45 28.28 84.28)"/>
+  <!-- 10:30 (315 degrees) -->
+  <rect x="25.72" y="11.72" width="6" height="8" fill="#FA8072" rx="1" transform="rotate(-45 28.28 15.72)"/>
+  
+  <!-- Minute hand (longer, pointing to 12 o'clock) -->
+  <line x1="50" y1="50" x2="50" y2="25" stroke="#2A2A2A" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Hour hand (shorter, pointing to 5 o'clock) -->
+  <line x1="50" y1="50" x2="58" y2="65" stroke="#2A2A2A" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Center pivot (salmon colored circle) -->
+  <circle cx="50" cy="50" r="5" fill="#FA8072"/>
+</svg>
+

@@ -1,0 +1,77 @@
+[
+  {
+    "id": "pf_rwid",
+    "name": "RWID Community",
+    "slug": "rwid",
+    "ownerId": "owner_olivia",
+    "branding": {
+      "primaryColor": "#66b132",
+      "logoUrl": "",
+      "accentColor": "#3c7a0b"
+    },
+    "settings": {
+      "features": {
+        "communities": true,
+        "courses": true,
+        "successStories": true
+      },
+      "limits": {
+        "maxCommunities": 50,
+        "maxCourses": 200,
+        "maxMembers": 100000
+      }
+    },
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "pf_designhub",
+    "name": "Design Hub",
+    "slug": "designhub",
+    "ownerId": "owner_design",
+    "branding": {
+      "primaryColor": "#6C63FF",
+      "logoUrl": "",
+      "accentColor": "#4B46B8"
+    },
+    "settings": {
+      "features": { "communities": true, "courses": true, "successStories": true },
+      "limits": { "maxCommunities": 50, "maxCourses": 200, "maxMembers": 100000 }
+    },
+    "createdAt": "2024-02-01T00:00:00.000Z"
+  },
+  {
+    "id": "pf_jobseekers",
+    "name": "Job Seekers",
+    "slug": "jobseekers",
+    "ownerId": "owner_jobs",
+    "branding": {
+      "primaryColor": "#0EA5E9",
+      "logoUrl": "",
+      "accentColor": "#0369A1"
+    },
+    "settings": {
+      "features": { "communities": true, "courses": true, "successStories": true },
+      "limits": { "maxCommunities": 50, "maxCourses": 200, "maxMembers": 100000 }
+    },
+    "createdAt": "2024-03-01T00:00:00.000Z"
+  },
+  {
+    "id": "pf_reactlearn",
+    "name": "React Learners",
+    "slug": "reactlearn",
+    "ownerId": "owner_react",
+    "branding": {
+      "primaryColor": "#10B981",
+      "logoUrl": "",
+      "accentColor": "#047857"
+    },
+    "settings": {
+      "features": { "communities": true, "courses": true, "successStories": true },
+      "limits": { "maxCommunities": 50, "maxCourses": 200, "maxMembers": 100000 }
+    },
+    "createdAt": "2024-04-01T00:00:00.000Z"
+  }
+]
+
+
+

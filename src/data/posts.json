@@ -1,0 +1,22 @@
+[
+  {
+    "id": "p_1",
+    "authorId": "u_alex",
+    "communityId": "c_react",
+    "platformId": "pf_rwid",
+    "content": "Pro tip: use the React Compiler to reduce re-renders in client components.",
+    "createdAt": "2025-10-01T10:00:00Z",
+    "likes": 24
+  },
+  {
+    "id": "p_2",
+    "authorId": "u_sam",
+    "communityId": "c_job",
+    "platformId": "pf_rwid",
+    "content": "New notebook: Exploring decision trees with a simple dataset.",
+    "createdAt": "2025-10-02T09:30:00Z",
+    "likes": 18
+  }
+]
+
+

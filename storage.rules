@@ -1,0 +1,108 @@
+// Storage Rules
+
+rules_version = '2';
+
+service firebase.storage {
+
+  match /b/{bucket}/o {
+
+    function isSignedIn() { return request.auth != null; }
+
+    function isOwner(platformId) {
+      return isSignedIn() &&
+             exists(/databases/(default)/documents/platforms/$(platformId)) &&
+             get(/databases/(default)/documents/platforms/$(platformId)).data.ownerId == request.auth.uid;
+    }
+    
+    function isOwnerOrMember(platformId) {
+      return isOwner(platformId) || 
+             (isSignedIn() && 
+              exists(/databases/(default)/documents/platforms/$(platformId)/members/$(request.auth.uid)));
+    }
+
+    function isMember(platformId) {
+
+      return isSignedIn() &&
+
+             exists(/databases/(default)/documents/platforms/$(platformId)/members/$(request.auth.uid));
+
+    }
+
+
+    // Lesson videos (note: uses platformId, not slug)
+
+    match /platforms/{platformId}/courses/{courseId}/lessons/{lessonId}/{file=**} {
+
+      allow read: if true;
+
+      allow write: if isSignedIn();  // TEMP to test
+
+    }
+
+    // Success stories photos (uses platformId, not slug)
+
+    match /platforms/{platformId}/success-stories/{storyId}/{file=**} {
+
+      allow read: if true;
+
+      allow write: if isOwner(platformId);
+
+    }
+
+    // existing rules you already have ...
+
+    match /platforms/{slug}/branding/{file=**} {
+
+      allow read: if true;
+
+      allow write: if isSignedIn();
+
+    }
+
+    match /platforms/{slug}/posts/{file=**} {
+
+      allow read: if true;
+
+      allow write: if isSignedIn();
+
+    }
+
+    // Community icons/logos (uses platformId in path for owner verification)
+    match /platforms/{platformId}/communities/{communityId}/{file=**} {
+
+      allow read: if true;
+
+      // Temporarily allow write for signed-in users - we'll verify ownership in client code
+      // This makes debugging easier
+      allow write: if isSignedIn();
+
+    }
+
+    match /avatars/{userId} {
+
+      allow read: if true;
+
+      allow write: if isSignedIn() && request.auth.uid == userId && request.resource.size < 5 * 1024 * 1024;
+
+    }
+
+    match /banners/{userId} {
+
+      allow read: if true;
+
+      allow write: if isSignedIn() && request.auth.uid == userId && request.resource.size < 5 * 1024 * 1024;
+
+    }
+
+    match /{allPaths=**} {
+
+      allow read: if false;
+
+      allow write: if false;
+
+    }
+
+  }
+
+}
+

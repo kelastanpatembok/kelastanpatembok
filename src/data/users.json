@@ -1,0 +1,48 @@
+[
+  {
+    "id": "u_owner",
+    "name": "RWID Owner",
+    "avatarUrl": "/vercel.svg",
+    "bio": "Founder of RWID Community",
+    "role": "owner",
+    "platformId": "pf_rwid",
+    "username": "owner",
+    "password": "owner123",
+    "interests": ["Community", "Product", "Leadership"]
+  },
+  {
+    "id": "u_member",
+    "name": "Member Mia",
+    "avatarUrl": "/next.svg",
+    "bio": "Active community member",
+    "role": "member",
+    "platformId": "pf_rwid",
+    "username": "member",
+    "password": "member123",
+    "interests": ["Learning", "Projects"]
+  },
+  {
+    "id": "u_mentor",
+    "name": "Mentor Max",
+    "avatarUrl": "/vercel.svg",
+    "bio": "Helps learners grow",
+    "role": "mentor",
+    "platformId": "pf_rwid",
+    "username": "mentor",
+    "password": "mentor123",
+    "interests": ["Guidance", "Code Review"]
+  },
+  {
+    "id": "u_visitor",
+    "name": "Visitor Violet",
+    "avatarUrl": "/next.svg",
+    "bio": "Checking things out",
+    "role": "visitor",
+    "platformId": "pf_rwid",
+    "username": "visitor",
+    "password": "visitor123",
+    "interests": ["Exploration"]
+  }
+]
+
+

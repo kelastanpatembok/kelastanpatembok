@@ -1,0 +1,39 @@
+[
+  {
+    "id": "course_design_basics",
+    "title": "Graphic Design Fundamentals",
+    "level": "Beginner",
+    "lessons": 15,
+    "communityId": "c_design"
+  },
+  {
+    "id": "course_typography",
+    "title": "Typography Mastery",
+    "level": "Intermediate",
+    "lessons": 8,
+    "communityId": "c_design"
+  },
+  {
+    "id": "course_color_theory",
+    "title": "Color Theory & Application",
+    "level": "Beginner",
+    "lessons": 6,
+    "communityId": "c_design"
+  },
+  {
+    "id": "course_logo_design",
+    "title": "Logo Design Principles",
+    "level": "Intermediate",
+    "lessons": 10,
+    "communityId": "c_design"
+  },
+  {
+    "id": "course_ui_ux_basics",
+    "title": "UI/UX Design Basics",
+    "level": "Beginner",
+    "lessons": 12,
+    "communityId": "c_design"
+  }
+]
+
+

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "course_nextjs",
+    "title": "Next.js Fundamentals",
+    "level": "Beginner",
+    "communityId": "c_react",
+    "platformId": "pf_rwid",
+    "lessons": 14
+  },
+  {
+    "id": "course_ml101",
+    "title": "Machine Learning 101",
+    "level": "Beginner",
+    "communityId": "c_job",
+    "platformId": "pf_rwid",
+    "lessons": 10
+  }
+]
+
+

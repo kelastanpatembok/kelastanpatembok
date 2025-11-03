@@ -1,0 +1,25 @@
+[
+  {
+    "id": "course_portfolio_basics",
+    "title": "Portfolio Design Fundamentals",
+    "level": "Beginner",
+    "lessons": 8,
+    "communityId": "c_portfolio"
+  },
+  {
+    "id": "course_personal_branding",
+    "title": "Personal Branding for Developers",
+    "level": "Intermediate",
+    "lessons": 12,
+    "communityId": "c_portfolio"
+  },
+  {
+    "id": "course_github_profile",
+    "title": "GitHub Profile Optimization",
+    "level": "Beginner",
+    "lessons": 6,
+    "communityId": "c_portfolio"
+  }
+]
+
+

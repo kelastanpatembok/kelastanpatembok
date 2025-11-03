@@ -1,0 +1,171 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isMember(pId) {
+      return isSignedIn() &&
+             exists(/databases/$(database)/documents/platforms/$(pId)/members/$(request.auth.uid));
+    }
+    function isOwner(pId) {
+      return isSignedIn() &&
+             get(/databases/$(database)/documents/platforms/$(pId)).data.ownerId == request.auth.uid;
+    }
+    function isUserOwner() {
+      return isSignedIn() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "owner";
+    }
+
+    match /platforms/{platformId} {
+      allow read: if true;
+      allow create: if isUserOwner();
+      allow update: if isOwner(platformId);
+      allow delete: if false;
+
+      // Communities
+      match /communities/{communityId} {
+        allow read: if true;
+        allow create, delete: if isOwner(platformId);
+        // Allow update: owner can update anything, signed-in users can only update memberCount (for payment callback)
+        allow update: if isOwner(platformId) ||
+                      (isSignedIn() && 
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCount']) &&
+                       request.resource.data.memberCount >= (resource.data.memberCount != null ? resource.data.memberCount : 0));
+        
+        // Messages collection (community chat)
+        match /messages/{messageId} {
+          allow read: if isSignedIn() && isMember(platformId);
+          allow create: if isSignedIn() && 
+                          isMember(platformId) && 
+                          request.auth.uid == request.resource.data.createdBy;
+          allow update: if isSignedIn() && 
+                          isMember(platformId) && 
+                          request.auth.uid == resource.data.createdBy;
+          allow delete: if isSignedIn() && 
+                          isMember(platformId) && 
+                          (request.auth.uid == resource.data.createdBy || isOwner(platformId));
+        }
+        
+        // Typing indicators collection
+        match /typing/{userId} {
+          allow read: if isSignedIn() && isMember(platformId);
+          allow write: if isSignedIn() && 
+                          isMember(platformId) && 
+                          request.auth.uid == userId;
+        }
+      }
+
+     // Courses
+      match /courses/{courseId} {
+  allow read: if true;
+  allow create, update, delete: if isMember(platformId);
+  
+  // Sections - allow owner to manage
+  match /sections/{sectionId} {
+    allow read: if true;
+    allow create, update, delete: if isOwner(platformId) || isMember(platformId);
+    
+    // Lessons - allow owner to manage
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner(platformId) || isMember(platformId);
+    }
+  }
+  
+  // Enrollments (progress per-user)
+        match /enrollments/{userId} {
+          allow read, write: if isSignedIn() && request.auth.uid == userId;
+        }
+}
+
+      // Posts (owner-only posting for now)
+      match /posts/{postId} {
+        allow read: if true;
+        allow create: if isOwner(platformId);
+        allow update, delete: if isOwner(platformId);
+
+        match /comments/{commentId} {
+          allow read: if true;
+          allow create, update, delete: if isMember(platformId);
+        }
+        match /reactions/{userId} {
+          allow read: if true;
+          allow create, update, delete: if isSignedIn() && request.auth.uid == userId;
+        }
+      }
+
+      // Forums (member/owner can create threads)
+      match /forums/{threadId} {
+        allow read: if true;
+        allow create: if isSignedIn() && 
+                       (isMember(platformId) || isOwner(platformId)) &&
+                       request.auth.uid == request.resource.data.authorId;
+        allow update: if isSignedIn() && 
+                       (isMember(platformId) || isOwner(platformId)) &&
+                       request.auth.uid == resource.data.authorId;
+        allow delete: if isSignedIn() && 
+                       (isMember(platformId) || isOwner(platformId)) &&
+                       (request.auth.uid == resource.data.authorId || isOwner(platformId));
+
+        // Replies to forum threads
+        match /replies/{replyId} {
+          allow read: if true;
+          allow create: if isSignedIn() && 
+                         (isMember(platformId) || isOwner(platformId)) &&
+                         request.auth.uid == request.resource.data.authorId;
+          allow update: if isSignedIn() && 
+                         (isMember(platformId) || isOwner(platformId)) &&
+                         request.auth.uid == resource.data.authorId;
+          allow delete: if isSignedIn() && 
+                         (isMember(platformId) || isOwner(platformId)) &&
+                         (request.auth.uid == resource.data.authorId || isOwner(platformId));
+        }
+      }
+
+      // Success stories
+      match /successStories/{storyId} {
+        allow read: if true;
+        allow create, update, delete: if isMember(platformId);
+      }
+
+      // Membership (platform roles)
+      match /members/{userId} {
+        // Allow users to create their own membership (e.g., after payment)
+        allow create: if isSignedIn() && request.auth.uid == userId;
+
+        allow read: if isSignedIn() && request.auth.uid == userId;
+        allow update: if isSignedIn() && request.auth.uid == userId;
+        allow delete: if false;
+      }
+      
+      // Payments
+      match /payments/{paymentId} {
+        allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+        allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+        allow update, delete: if false;
+      }
+    }
+
+    // Users (global profile)
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
+      
+      // Bookmarks
+      match /bookmarks/{bookmarkId} {
+        allow read: if isSignedIn() && request.auth.uid == userId;
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        allow update, delete: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // Skills collection
+    match /skills/{skillId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+  }
+}
+

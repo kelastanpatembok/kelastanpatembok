@@ -1,0 +1,39 @@
+[
+  {
+    "id": "c_job",
+    "name": "Job Hunting",
+    "description": "Strategies, resume tips, interview prep, and networking for tech roles.",
+    "memberCount": 1540,
+    "platformId": "pf_rwid"
+  },
+  {
+    "id": "c_portfolio",
+    "name": "Portofolio & Branding",
+    "description": "Showcase work, build your personal brand, and get portfolio feedback.",
+    "memberCount": 860,
+    "platformId": "pf_rwid"
+  },
+  {
+    "id": "c_va",
+    "name": "Virtual Assisstant",
+    "description": "Tools, SOPs, and workflows to thrive as a virtual assistant.",
+    "memberCount": 620,
+    "platformId": "pf_rwid"
+  },
+  {
+    "id": "c_design",
+    "name": "Graphic Design",
+    "description": "Typography, color, layout, and critique for aspiring designers.",
+    "memberCount": 1120,
+    "platformId": "pf_rwid"
+  },
+  {
+    "id": "c_react",
+    "name": "ReactJS",
+    "description": "Learn React patterns, performance, and ecosystem best practices.",
+    "memberCount": 1980,
+    "platformId": "pf_rwid"
+  }
+]
+
+
