@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { db, storage, auth } from "@/lib/firebase";
 import { collection, doc, getDocs, limit, query, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -32,6 +33,7 @@ export default function EditPlatformPage({ params }: Params) {
   const [logoUrl, setLogoUrl] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
+  const [isPublic, setIsPublic] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -61,6 +63,7 @@ export default function EditPlatformPage({ params }: Params) {
         setPrimaryColor((p.branding?.primaryColor) || "#66b132");
         setLogoUrl((p.branding?.logoUrl) || "");
         setLogoPreview((p.branding?.logoUrl) || "");
+        setIsPublic(p.public === true);
         setLoading(false);
       } catch (error) {
         console.error("Error loading platform:", error);
@@ -137,6 +140,19 @@ export default function EditPlatformPage({ params }: Params) {
             <p className="mt-1 text-xs text-muted-foreground">
               {description.length} characters
             </p>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="public-toggle">Public platform</Label>
+              <p className="text-xs text-muted-foreground">
+                When enabled, this platform will be visible in the platform browser and platform switcher.
+              </p>
+            </div>
+            <Switch
+              id="public-toggle"
+              checked={isPublic}
+              onCheckedChange={setIsPublic}
+            />
           </div>
         </CardContent>
       </Card>
@@ -217,6 +233,7 @@ export default function EditPlatformPage({ params }: Params) {
                 name,
                 tagline: tagline || null,
                 description: description || null,
+                public: isPublic,
                 branding: {
                   ...(platform.branding || {}),
                   primaryColor,

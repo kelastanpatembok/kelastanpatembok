@@ -35,6 +35,8 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
   const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<string>>(new Set());
   const [isMember, setIsMember] = useState(false);
   const [commentsPreviewByPost, setCommentsPreviewByPost] = useState<Record<string, any[]>>({});
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessLoading, setAccessLoading] = useState(true);
 
   // feed controls
   const [activeTab, setActiveTab] = useState("all");
@@ -44,30 +46,54 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
 
   useEffect(() => {
     (async () => {
-      // platform by slug
-      const ps = await getDocs(query(collection(db, "platforms"), where("slug", "==", slug), limit(1)));
-      const p = ps.docs[0] ? { id: ps.docs[0].id, ...ps.docs[0].data() } : null;
-      setPlatform(p);
-      if (p) {
+      setAccessLoading(true);
+      try {
+        // platform by slug - try to read, will fail if not public and user not owner/member
+        const ps = await getDocs(query(collection(db, "platforms"), where("slug", "==", slug), limit(1)));
+        const p = ps.docs[0] ? { id: ps.docs[0].id, ...ps.docs[0].data() } : null;
+        setPlatform(p);
+        
+        if (!p) {
+          setAccessLoading(false);
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has access
+        const isPublic = p.public === true;
+        const u: any = user;
+        const pid = (p as any).ownerId;
+        const isOwnerCheck = !!(u && pid && (pid === u.uid || pid === u.id));
+        
+        // Check membership
+        let isMemberCheck = false;
+        try {
+          const uid = auth.currentUser?.uid || (u?.uid);
+          if (uid) {
+            const m = await getDoc(doc(db, "platforms", p.id as string, "members", uid));
+            isMemberCheck = m.exists();
+          }
+        } catch {}
+
+        const hasAccessCheck = isPublic || isOwnerCheck || isMemberCheck;
+        setHasAccess(hasAccessCheck);
+        setIsOwner(isOwnerCheck);
+        setIsMember(isMemberCheck);
+
+        if (!hasAccessCheck) {
+          // User doesn't have access, stop loading and show access denied UI
+          setAccessLoading(false);
+          setLoading(false);
+          return;
+        }
+
+        // User has access, load platform content
+        if (p) {
         const snap = await getDocs(query(collection(db, "platforms", p.id as string, "posts"), orderBy("createdAt", "desc")) as any);
         const list = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as any[];
         setPosts(list as any[]);
         const cs = await getDocs(collection(db, "platforms", p.id as string, "communities"));
         setCommunities(cs.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as any[]);
-        // Owner check: match ownerId to current user's uid or id
-        const u: any = user;
-        const pid = (p as any).ownerId;
-        setIsOwner(!!(u && pid && (pid === u.uid || pid === u.id)));
-        // Member check
-        try {
-          const uid = auth.currentUser?.uid || (u?.uid);
-          if (uid) {
-            const m = await getDoc(doc(db, "platforms", p.id as string, "members", uid));
-            setIsMember(m.exists());
-          } else {
-            setIsMember(false);
-          }
-        } catch {}
         // Load latest 3 comments per post (preview)
         try {
           const preview: Record<string, any[]> = {};
@@ -102,12 +128,27 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
             setBookmarkedPosts(bookmarked);
           }
         } catch {}
+        setAccessLoading(false);
+        setLoading(false);
       } else {
         setPosts([]);
         setCommunities([]);
         setIsOwner(false);
+        setAccessLoading(false);
+        setLoading(false);
       }
-      setLoading(false);
+    } catch (error: any) {
+      // If access is denied by Firestore rules, handle gracefully
+      console.error("Error loading platform:", error);
+      if (error.code === 'permission-denied') {
+        setHasAccess(false);
+        setAccessLoading(false);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        setAccessLoading(false);
+      }
+    }
     })();
     const isNewUser = !localStorage.getItem("rwid_onboarding_dismissed");
     if (isNewUser && user) setShowOnboarding(true);
@@ -528,7 +569,7 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
   }
   const featuredStories: any[] = [];
 
-  if (loading) {
+  if (loading || accessLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-16 w-1/2" />
@@ -539,6 +580,61 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
               <Skeleton className="h-4 w-3/4 mt-3" />
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied UI if user doesn't have access
+  if (platform && !hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 px-4">
+        <div className="text-center space-y-4 max-w-md">
+          <h1 className="text-3xl font-bold">{platform.name || "Platform"}</h1>
+          <p className="text-muted-foreground">
+            This platform is private. Join to access communities, courses, and posts.
+          </p>
+          {platform.description && (
+            <p className="text-sm text-muted-foreground mt-4">
+              {platform.description}
+            </p>
+          )}
+          {!user ? (
+            <div className="space-y-2 pt-4">
+              <p className="text-sm text-muted-foreground">Sign in to join this platform</p>
+              <Button asChild>
+                <Link href="/">Sign In</Link>
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={async () => {
+                if (!user || !platform) return;
+                try {
+                  const uid = auth.currentUser?.uid || (user as any)?.uid || (user as any)?.id;
+                  if (!uid) {
+                    toast.error("Please sign in to join");
+                    return;
+                  }
+                  // Create membership
+                  await setDoc(doc(db, "platforms", platform.id as string, "members", uid), {
+                    role: "member",
+                    joinedAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp(),
+                  });
+                  toast.success("Successfully joined platform!");
+                  // Refresh page to show content
+                  window.location.reload();
+                } catch (error: any) {
+                  console.error("Error joining platform:", error);
+                  toast.error("Failed to join platform: " + (error?.message || "Unknown error"));
+                }
+              }}
+              className="mt-4"
+            >
+              Join Platform
+            </Button>
+          )}
         </div>
       </div>
     );

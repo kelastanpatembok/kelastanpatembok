@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export function PlatformSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [platforms, setPlatforms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +28,8 @@ export function PlatformSwitcher() {
       setLoading(true);
       (async () => {
         try {
-          const snap = await getDocs(collection(db, "platforms"));
+          // Only show platforms with public: true
+          const snap = await getDocs(query(collection(db, "platforms"), where("public", "==", true)));
           const platformsData = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
           setPlatforms(platformsData);
         } catch (error) {
@@ -42,8 +43,8 @@ export function PlatformSwitcher() {
   }, [open]);
 
   const list = platforms.filter(p => 
-    (p.name?.toLowerCase() || "").includes(query.toLowerCase()) || 
-    (p.slug?.toLowerCase() || "").includes(query.toLowerCase())
+    (p.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) || 
+    (p.slug?.toLowerCase() || "").includes(searchQuery.toLowerCase())
   );
 
   function goTo(slug: string) {
@@ -80,7 +81,7 @@ export function PlatformSwitcher() {
             <DialogTitle>Switch platform</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Search platforms..." value={query} onChange={(e)=> setQuery(e.target.value)} />
+            <Input placeholder="Search platforms..." value={searchQuery} onChange={(e)=> setSearchQuery(e.target.value)} />
             <div className="max-h-72 overflow-auto divide-y rounded-md border">
               {loading ? (
                 <div className="p-3 space-y-2">

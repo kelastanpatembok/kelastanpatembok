@@ -15,8 +15,17 @@ service cloud.firestore {
              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "owner";
     }
+    function isPublicPlatform(pId) {
+      return get(/databases/$(database)/documents/platforms/$(pId)).data.public == true;
+    }
+    function canAccessPlatform(pId) {
+      return isPublicPlatform(pId) || isOwner(pId) || isMember(pId);
+    }
 
     match /platforms/{platformId} {
+      // Allow reading platform document for everyone (for discovery)
+      // This allows users to see basic platform info (name, description, branding) before joining
+      // Content access (posts, communities, courses) is still protected by canAccessPlatform()
       allow read: if true;
       allow create: if isUserOwner();
       allow update: if isOwner(platformId);
@@ -24,7 +33,7 @@ service cloud.firestore {
 
       // Communities
       match /communities/{communityId} {
-        allow read: if true;
+        allow read: if canAccessPlatform(platformId);
         allow create, delete: if isOwner(platformId);
         // Allow update: owner can update anything, signed-in users can only update memberCount (for payment callback)
         allow update: if isOwner(platformId) ||
@@ -57,17 +66,17 @@ service cloud.firestore {
 
      // Courses
       match /courses/{courseId} {
-  allow read: if true;
+  allow read: if canAccessPlatform(platformId);
   allow create, update, delete: if isMember(platformId);
   
   // Sections - allow owner to manage
   match /sections/{sectionId} {
-    allow read: if true;
+    allow read: if canAccessPlatform(platformId);
     allow create, update, delete: if isOwner(platformId) || isMember(platformId);
     
     // Lessons - allow owner to manage
     match /lessons/{lessonId} {
-      allow read: if true;
+      allow read: if canAccessPlatform(platformId);
       allow create, update, delete: if isOwner(platformId) || isMember(platformId);
     }
   }
@@ -80,7 +89,7 @@ service cloud.firestore {
 
       // Posts (owner-only posting for now)
       match /posts/{postId} {
-        allow read: if true;
+        allow read: if canAccessPlatform(platformId);
         allow create: if isOwner(platformId);
         allow update, delete: if isOwner(platformId);
 
@@ -96,7 +105,7 @@ service cloud.firestore {
 
       // Forums (member/owner can create threads)
       match /forums/{threadId} {
-        allow read: if true;
+        allow read: if canAccessPlatform(platformId);
         allow create: if isSignedIn() && 
                        (isMember(platformId) || isOwner(platformId)) &&
                        request.auth.uid == request.resource.data.authorId;
@@ -124,7 +133,7 @@ service cloud.firestore {
 
       // Success stories
       match /successStories/{storyId} {
-        allow read: if true;
+        allow read: if canAccessPlatform(platformId);
         allow create, update, delete: if isMember(platformId);
       }
 

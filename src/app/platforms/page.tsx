@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
-import { collection, deleteDoc, doc, getDocs, limit, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, limit, query, where } from "firebase/firestore";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { PlatformSwitcher } from "@/components/platform-switcher";
@@ -26,7 +26,8 @@ export default function PlatformsBrowserPage() {
 
   useEffect(() => {
     (async () => {
-      const snap = await getDocs(query(collection(db, "platforms")));
+      // Only show platforms with public: true
+      const snap = await getDocs(query(collection(db, "platforms"), where("public", "==", true)));
       const list = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
       setPlatforms(list);
     })();

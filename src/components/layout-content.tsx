@@ -5,10 +5,12 @@ import { LeftSidebar, useSidebar, SidebarContext } from "@/components/left-sideb
 import { Footer } from "@/components/footer";
 import { useState, useEffect, useCallback, ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/auth-provider";
 
 export function LayoutContent({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   useEffect(() => {
     const saved = localStorage.getItem("rwid_sidebar_collapsed");
@@ -29,6 +31,10 @@ export function LayoutContent({ children }: { children: ReactNode }) {
   const isBookmarksPage = pathname === "/bookmarks";
   // Profile pages should hide the left sidebar
   const isProfilePage = pathname.startsWith("/profile");
+  // Check if we're on a platform page (has slug)
+  const isPlatformPage = pathname.startsWith("/platforms/") && pathname.split("/").length >= 3;
+  // Hide sidebar for non-authenticated users on platform pages
+  const shouldHideSidebarForNonAuth = isPlatformPage && !user;
 
   if (isCourseViewer || isPlatformCreate) {
     // For course viewer and platform create, render children directly without main site layout
@@ -40,8 +46,8 @@ export function LayoutContent({ children }: { children: ReactNode }) {
     window.dispatchEvent(new CustomEvent('community-deleted'));
   }, []);
 
-  if (isPaymentPage || isBookmarksPage || isProfilePage || isPlatformsIndex) {
-    // For payment/bookmarks/profile/platforms pages, show header but no sidebar
+  if (isPaymentPage || isBookmarksPage || isProfilePage || isPlatformsIndex || shouldHideSidebarForNonAuth) {
+    // For payment/bookmarks/profile/platforms pages, or non-auth users on platform pages, show header but no sidebar
     return (
       <SidebarContext.Provider value={{ collapsed, setCollapsed, refreshCommunities }}>
         <div className="flex min-h-screen flex-col">
