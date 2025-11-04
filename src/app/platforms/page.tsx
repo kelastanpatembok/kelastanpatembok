@@ -7,9 +7,11 @@ import { collection, getDocs, limit, query } from "firebase/firestore";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { PlatformSwitcher } from "@/components/platform-switcher";
+import { useAuth } from "@/components/auth-provider";
 
 export default function PlatformsBrowserPage() {
   const [platforms, setPlatforms] = useState<any[]>([]);
+  const { user } = useAuth();
   const enableCreate = process.env.NEXT_PUBLIC_ENABLE_PLATFORM_CREATION === "1";
   const enableSwitcher = process.env.NEXT_PUBLIC_ENABLE_PLATFORM_SWITCHER === "1";
 
@@ -30,7 +32,7 @@ export default function PlatformsBrowserPage() {
         <h1 className="text-2xl font-semibold">Platform browser</h1>
         <div className="flex items-center gap-2">
           {enableSwitcher ? <PlatformSwitcher /> : null}
-          {enableCreate ? (
+          {enableCreate && user?.role === "owner" ? (
             <Button asChild>
               <Link href="/platforms/create">Create platform</Link>
             </Button>
