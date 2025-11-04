@@ -132,40 +132,21 @@ export default async function PostDetailPage({ params }: Params) {
     platform = serializeForClient(platformData);
     const platformId = ps.docs[0].id;
     
-    // Get post by id
+    // Get post by id - this will fail if user doesn't have access to private platform
     const postDoc = await getDoc(doc(db, "platforms", platformId, "posts", id));
     if (!postDoc.exists()) {
-      return (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Post not found</h2>
-            <Button asChild>
-              <Link href={`/platforms/${slug}`}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to platform
-              </Link>
-            </Button>
-          </div>
-        </div>
-      );
+      return <PostDetailClient platform={platform} post={null} slug={slug} id={id} error="not-found" />;
     }
     
     post = serializeForClient({ id: postDoc.id, ...postDoc.data() });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error loading post:", error);
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Error loading post</h2>
-          <Button asChild>
-            <Link href={`/platforms/${slug}`}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to platform
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
+    // If permission denied, show access denied UI
+    if (error.code === 'permission-denied' && platform) {
+      return <PostDetailClient platform={platform} post={null} slug={slug} id={id} error="access-denied" />;
+    }
+    // For other errors or missing platform, show generic error
+    return <PostDetailClient platform={platform || null} post={null} slug={slug} id={id} error="error" />;
   }
   
   return <PostDetailClient platform={platform} post={post} slug={slug} id={id} />;
