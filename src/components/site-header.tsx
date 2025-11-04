@@ -42,10 +42,13 @@ export function SiteHeader() {
   const [platformName, setPlatformName] = useState<string | null>(null);
 
   // Resolve platform brand from path if under /platforms/[slug]
+  // Only show platform name when actually on a platform route (not /platforms, /profile, etc.)
   let brandName = "Kelas Tanpa Tembok";
   let brandHref = "/";
+  const isPlatformRoute = pathname.startsWith("/platforms/") && pathname.split("/").length >= 3;
+  
   try {
-    if (pathname.startsWith("/platforms/")) {
+    if (isPlatformRoute) {
       const parts = pathname.split("/");
       const slug = parts[2];
       if (slug) {
@@ -62,6 +65,7 @@ export function SiteHeader() {
         }
       }
     }
+    // For non-platform routes (/platforms, /profile, etc.), brandName stays "Kelas Tanpa Tembok"
   } catch {}
 
   // Derive role within current platform (owner/member) for label and get tagline
@@ -69,12 +73,17 @@ export function SiteHeader() {
     let active = true;
     (async () => {
       try {
+        // Always reset platform state first
         setPlatformRole(null);
         setPlatformTagline(null);
         setPlatformLogo(null);
         setPlatformPrimaryColor(null);
         setPlatformName(null);
-        if (!pathname.startsWith("/platforms/")) return;
+        
+        // Only load platform data if we're on an actual platform route (not /platforms, /profile, etc.)
+        const isPlatformRoute = pathname.startsWith("/platforms/") && pathname.split("/").length >= 3;
+        if (!isPlatformRoute) return;
+        
         const slug = pathname.split("/")[2];
         const snap = await getDocs(query(collection(db, "platforms"), where("slug", "==", slug), limit(1)));
         const platform = snap.docs[0] ? { id: snap.docs[0].id, ...snap.docs[0].data() } as any : null;
@@ -126,13 +135,17 @@ export function SiteHeader() {
         {/* Center: brand - absolutely centered */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link href={brandHref} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            {platformLogo && (
+            {(platformLogo || brandName === "Kelas Tanpa Tembok") && (
               <div className="h-8 w-8 rounded-lg bg-muted overflow-hidden shrink-0 border-2" style={{ borderColor: platformPrimaryColor || undefined }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={platformLogo} alt="logo" className="h-full w-full object-cover" />
+                <img 
+                  src={platformLogo || "/tanpadinding.jpg"} 
+                  alt={brandName === "Kelas Tanpa Tembok" ? "Kelas Tanpa Tembok logo" : "logo"} 
+                  className="h-full w-full object-cover" 
+                />
               </div>
             )}
-            <div className="flex flex-col items-start gap-0.5">
+            <div className="hidden md:flex flex-col items-start gap-0.5">
               <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 {brandName}
               </span>

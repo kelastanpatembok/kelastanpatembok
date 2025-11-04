@@ -19,7 +19,7 @@ export function LayoutContent({ children }: { children: ReactNode }) {
   const isCourseViewer = pathname.includes("/courses/") && pathname.includes("/view");
   // Platform creation route should bypass main layout as it's platform-agnostic
   const isPlatformCreate = pathname === "/platforms/create";
-  // Platforms browser should also be platform-agnostic
+  // Platforms browser should show header but no sidebar (platform-agnostic)
   const isPlatformsIndex = pathname === "/platforms";
   // Home landing should hide the left sidebar but keep header
   const isHomeLanding = pathname === "/";
@@ -30,8 +30,8 @@ export function LayoutContent({ children }: { children: ReactNode }) {
   // Profile pages should hide the left sidebar
   const isProfilePage = pathname.startsWith("/profile");
 
-  if (isCourseViewer || isPlatformCreate || isPlatformsIndex) {
-    // For course viewer, render children directly without main site layout
+  if (isCourseViewer || isPlatformCreate) {
+    // For course viewer and platform create, render children directly without main site layout
     return <>{children}</>;
   }
   
@@ -40,8 +40,8 @@ export function LayoutContent({ children }: { children: ReactNode }) {
     window.dispatchEvent(new CustomEvent('community-deleted'));
   }, []);
 
-  if (isPaymentPage || isBookmarksPage || isProfilePage) {
-    // For payment/bookmarks/profile pages, show header but no sidebar
+  if (isPaymentPage || isBookmarksPage || isProfilePage || isPlatformsIndex) {
+    // For payment/bookmarks/profile/platforms pages, show header but no sidebar
     return (
       <SidebarContext.Provider value={{ collapsed, setCollapsed, refreshCommunities }}>
         <div className="flex min-h-screen flex-col">

@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RWID Community",
+  title: "Kelas Tanpa Tembok",
   description: "A community-focused social learning platform.",
   icons: {
     icon: '/favicon.svg',
