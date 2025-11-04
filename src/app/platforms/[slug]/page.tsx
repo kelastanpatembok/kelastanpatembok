@@ -51,7 +51,7 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
       try {
         // platform by slug - try to read, will fail if not public and user not owner/member
         const ps = await getDocs(query(collection(db, "platforms"), where("slug", "==", slug), limit(1)));
-        const p = ps.docs[0] ? { id: ps.docs[0].id, ...ps.docs[0].data() } : null;
+        const p = ps.docs[0] ? { id: ps.docs[0].id, ...ps.docs[0].data() } as any : null;
         setPlatform(p);
         
         if (!p) {
@@ -61,7 +61,7 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
         }
 
         // Check if user has access
-        const isPublic = p.public === true;
+        const isPublic = (p as any).public === true;
         const u: any = user;
         const pid = (p as any).ownerId;
         const isOwnerCheck = !!(u && pid && (pid === u.uid || pid === u.id));
