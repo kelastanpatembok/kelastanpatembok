@@ -151,8 +151,8 @@ service cloud.firestore {
 
       // Membership Types (tiers/plans)
       match /membershipTypes/{typeId} {
-        // Allow read for any signed-in user (to see membership types before joining)
-        allow read: if isSignedIn();
+        // Allow read for anyone (to see membership types before joining)
+        allow read: if true;
         allow create, update, delete: if isOwner(platformId);
         
         // Members subcollection (users subscribed to this membership type)

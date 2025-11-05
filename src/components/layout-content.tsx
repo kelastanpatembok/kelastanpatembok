@@ -33,8 +33,10 @@ export function LayoutContent({ children }: { children: ReactNode }) {
   const isProfilePage = pathname.startsWith("/profile");
   // Check if we're on a platform page (has slug)
   const isPlatformPage = pathname.startsWith("/platforms/") && pathname.split("/").length >= 3;
-  // Hide sidebar for non-authenticated users on platform pages
-  const shouldHideSidebarForNonAuth = isPlatformPage && !user;
+  // Check if we're on membership page (should always show sidebar)
+  const isMembershipPage = pathname.includes("/membership");
+  // Hide sidebar for non-authenticated users on platform pages, but NOT on membership page
+  const shouldHideSidebarForNonAuth = isPlatformPage && !user && !isMembershipPage;
 
   if (isCourseViewer || isPlatformCreate) {
     // For course viewer and platform create, render children directly without main site layout
