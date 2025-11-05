@@ -154,6 +154,18 @@ service cloud.firestore {
         // Allow read for any signed-in user (to see membership types before joining)
         allow read: if isSignedIn();
         allow create, update, delete: if isOwner(platformId);
+        
+        // Members subcollection (users subscribed to this membership type)
+        match /members/{userId} {
+          // Allow read for any signed-in user (to check membership status)
+          allow read: if isSignedIn();
+          // Allow users to create their own membership (after payment)
+          allow create: if isSignedIn() && request.auth.uid == userId;
+          // Allow update only by the user themselves
+          allow update: if isSignedIn() && request.auth.uid == userId;
+          // Allow delete by owner or the user themselves
+          allow delete: if isSignedIn() && (request.auth.uid == userId || isOwner(platformId));
+        }
       }
       
       // Payments

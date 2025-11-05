@@ -29,6 +29,15 @@ export default function EditMembershipTypePage({ params }: { params: Promise<{ s
   const [typePriceOneTime, setTypePriceOneTime] = useState("");
   const [typePriceInstallment, setTypePriceInstallment] = useState("");
   const [typeInstallmentMonthCount, setTypeInstallmentMonthCount] = useState("");
+  const [promoCode, setPromoCode] = useState<string>("");
+  const [promoCodeType, setPromoCodeType] = useState<"percentage" | "amount">("percentage");
+  const [promoCodeValue, setPromoCodeValue] = useState<number>(0);
+  const [promoCode2, setPromoCode2] = useState<string>("");
+  const [promoCode2Type, setPromoCode2Type] = useState<"percentage" | "amount">("percentage");
+  const [promoCode2Value, setPromoCode2Value] = useState<number>(0);
+  const [promoCode3, setPromoCode3] = useState<string>("");
+  const [promoCode3Type, setPromoCode3Type] = useState<"percentage" | "amount">("percentage");
+  const [promoCode3Value, setPromoCode3Value] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +68,15 @@ export default function EditMembershipTypePage({ params }: { params: Promise<{ s
             setTypePriceOneTime(typeData.priceOneTime ? String(typeData.priceOneTime) : "");
             setTypePriceInstallment(typeData.priceInstallment ? String(typeData.priceInstallment) : "");
             setTypeInstallmentMonthCount(typeData.installmentMonthCount ? String(typeData.installmentMonthCount) : "");
+            setPromoCode(typeData.promoCode || "");
+            setPromoCodeType(typeData.promoCodeType || "percentage");
+            setPromoCodeValue(typeData.promoCodeValue || 0);
+            setPromoCode2(typeData.promoCode2 || "");
+            setPromoCode2Type(typeData.promoCode2Type || "percentage");
+            setPromoCode2Value(typeData.promoCode2Value || 0);
+            setPromoCode3(typeData.promoCode3 || "");
+            setPromoCode3Type(typeData.promoCode3Type || "percentage");
+            setPromoCode3Value(typeData.promoCode3Value || 0);
           }
         }
 
@@ -105,6 +123,37 @@ export default function EditMembershipTypePage({ params }: { params: Promise<{ s
         typeData.installmentMonthCount = installmentMonthCountValue;
       } else {
         typeData.installmentMonthCount = null;
+      }
+
+      // Save promo codes
+      if (promoCode.trim()) {
+        typeData.promoCode = promoCode.trim().toUpperCase();
+        typeData.promoCodeType = promoCodeType;
+        typeData.promoCodeValue = promoCodeValue;
+      } else {
+        typeData.promoCode = null;
+        typeData.promoCodeType = null;
+        typeData.promoCodeValue = null;
+      }
+
+      if (promoCode2.trim()) {
+        typeData.promoCode2 = promoCode2.trim().toUpperCase();
+        typeData.promoCode2Type = promoCode2Type;
+        typeData.promoCode2Value = promoCode2Value;
+      } else {
+        typeData.promoCode2 = null;
+        typeData.promoCode2Type = null;
+        typeData.promoCode2Value = null;
+      }
+
+      if (promoCode3.trim()) {
+        typeData.promoCode3 = promoCode3.trim().toUpperCase();
+        typeData.promoCode3Type = promoCode3Type;
+        typeData.promoCode3Value = promoCode3Value;
+      } else {
+        typeData.promoCode3 = null;
+        typeData.promoCode3Type = null;
+        typeData.promoCode3Value = null;
       }
 
       await updateDoc(doc(db, "platforms", platform.id, "membershipTypes", typeId), typeData);
@@ -242,6 +291,175 @@ export default function EditMembershipTypePage({ params }: { params: Promise<{ s
               step="1"
             />
             <p className="text-xs text-muted-foreground">Enter the number of months for installment payment</p>
+          </div>
+
+          <div className="pt-4 border-t space-y-4">
+            <h3 className="font-semibold">Promo Codes</h3>
+            
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <Label className="text-base font-semibold">Promo Code 1</Label>
+              <div>
+                <Label className="mb-1 block">Code</Label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={promoCode} 
+                    onChange={(e)=> setPromoCode(e.target.value.toUpperCase())} 
+                    placeholder="Auto-generated"
+                    maxLength={4}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      // Generate code in pattern: LETTER-NUMBER-LETTER-NUMBER
+                      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                      const numbers = "0123456789";
+                      
+                      const letter1 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number1 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      const letter2 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number2 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      
+                      setPromoCode(`${letter1}${number1}${letter2}${number2}`);
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <Label className="mb-1 block">Type</Label>
+                  <select 
+                    value={promoCodeType} 
+                    onChange={(e)=> setPromoCodeType(e.target.value as "percentage" | "amount")}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="amount">Amount (IDR)</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <Label className="mb-1 block">Value</Label>
+                  <Input 
+                    type="number" 
+                    value={promoCodeValue} 
+                    onChange={(e)=> setPromoCodeValue(parseFloat(e.target.value || "0"))} 
+                    placeholder={promoCodeType === "percentage" ? "e.g. 10" : "e.g. 50000"}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <Label className="text-base font-semibold">Promo Code 2</Label>
+              <div>
+                <Label className="mb-1 block">Code</Label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={promoCode2} 
+                    onChange={(e)=> setPromoCode2(e.target.value.toUpperCase())} 
+                    placeholder="Auto-generated"
+                    maxLength={4}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      // Generate code in pattern: LETTER-NUMBER-LETTER-NUMBER
+                      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                      const numbers = "0123456789";
+                      
+                      const letter1 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number1 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      const letter2 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number2 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      
+                      setPromoCode2(`${letter1}${number1}${letter2}${number2}`);
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <Label className="mb-1 block">Type</Label>
+                  <select 
+                    value={promoCode2Type} 
+                    onChange={(e)=> setPromoCode2Type(e.target.value as "percentage" | "amount")}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="amount">Amount (IDR)</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <Label className="mb-1 block">Value</Label>
+                  <Input 
+                    type="number" 
+                    value={promoCode2Value} 
+                    onChange={(e)=> setPromoCode2Value(parseFloat(e.target.value || "0"))} 
+                    placeholder={promoCode2Type === "percentage" ? "e.g. 10" : "e.g. 50000"}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <Label className="text-base font-semibold">Promo Code 3</Label>
+              <div>
+                <Label className="mb-1 block">Code</Label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={promoCode3} 
+                    onChange={(e)=> setPromoCode3(e.target.value.toUpperCase())} 
+                    placeholder="Auto-generated"
+                    maxLength={4}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      // Generate code in pattern: LETTER-NUMBER-LETTER-NUMBER
+                      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                      const numbers = "0123456789";
+                      
+                      const letter1 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number1 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      const letter2 = letters.charAt(Math.floor(Math.random() * letters.length));
+                      const number2 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+                      
+                      setPromoCode3(`${letter1}${number1}${letter2}${number2}`);
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <Label className="mb-1 block">Type</Label>
+                  <select 
+                    value={promoCode3Type} 
+                    onChange={(e)=> setPromoCode3Type(e.target.value as "percentage" | "amount")}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="amount">Amount (IDR)</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <Label className="mb-1 block">Value</Label>
+                  <Input 
+                    type="number" 
+                    value={promoCode3Value} 
+                    onChange={(e)=> setPromoCode3Value(parseFloat(e.target.value || "0"))} 
+                    placeholder={promoCode3Type === "percentage" ? "e.g. 10" : "e.g. 50000"}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     });
 
     const body = await request.json();
-    const { platformId, communityId, userId, userName, userEmail, amount } = body;
+    const { platformId, communityId, membershipTypeId, paymentType, userId, userName, userEmail, amount } = body;
 
-    if (!platformId || !communityId || !userId || !amount) {
+    // Validate required fields - either communityId or membershipTypeId must be present
+    if (!platformId || !userId || !amount || (!communityId && !membershipTypeId)) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -33,10 +34,31 @@ export async function POST(request: NextRequest) {
 
     // Generate shorter order ID (max 50 chars for Midtrans)
     const shortPlatformId = platformId.substring(0, 8);
-    const shortCommunityId = communityId.substring(0, 8);
     const shortUserId = userId.substring(0, 8);
     const timestamp = Date.now().toString().slice(-8);
-    const orderId = `${shortPlatformId}-${shortCommunityId}-${shortUserId}-${timestamp}`;
+    
+    let orderId: string;
+    let itemName: string;
+    let itemId: string;
+    let callbackParams: string;
+    
+    if (membershipTypeId) {
+      // Membership type payment
+      const shortMembershipTypeId = membershipTypeId.substring(0, 8);
+      orderId = `${shortPlatformId}-mtype-${shortMembershipTypeId}-${shortUserId}-${timestamp}`;
+      itemName = `Membership Subscription`;
+      itemId = membershipTypeId;
+      callbackParams = `platform=${platformId}&membershipType=${membershipTypeId}&paymentType=${paymentType || 'oneTime'}`;
+    } else {
+      // Community payment
+      const shortCommunityId = communityId.substring(0, 8);
+      orderId = `${shortPlatformId}-${shortCommunityId}-${shortUserId}-${timestamp}`;
+      itemName = `Community Access`;
+      itemId = communityId;
+      callbackParams = `platform=${platformId}&community=${communityId}`;
+    }
+    
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     
     const parameter = {
       transaction_details: {
@@ -49,19 +71,25 @@ export async function POST(request: NextRequest) {
       },
       item_details: [
         {
-          id: communityId,
+          id: itemId,
           price: amount,
           quantity: 1,
-          name: `Community Access`,
-          category: "Community Subscription",
+          name: itemName,
+          category: membershipTypeId ? "Membership Subscription" : "Community Subscription",
         },
       ],
       callbacks: {
-        finish: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/payment/callback?platform=${platformId}&community=${communityId}`,
-        unfinish: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/payment/callback?platform=${platformId}&community=${communityId}`,
-        error: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/payment/callback?platform=${platformId}&community=${communityId}`,
+        finish: `${baseUrl}/payment/callback?${callbackParams}`,
+        unfinish: `${baseUrl}/payment/callback?${callbackParams}`,
+        error: `${baseUrl}/payment/callback?${callbackParams}`,
       },
-      custom_field1: JSON.stringify({ platformId, communityId, userId }),
+      custom_field1: JSON.stringify({ 
+        platformId, 
+        communityId: communityId || null,
+        membershipTypeId: membershipTypeId || null,
+        paymentType: paymentType || null,
+        userId 
+      }),
     };
 
     const transaction = await snap.createTransaction(parameter);
