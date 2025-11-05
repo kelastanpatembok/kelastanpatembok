@@ -142,9 +142,18 @@ service cloud.firestore {
         // Allow users to create their own membership (e.g., after payment)
         allow create: if isSignedIn() && request.auth.uid == userId;
 
-        allow read: if isSignedIn() && request.auth.uid == userId;
+        // Allow read for any signed-in user (to see member list)
+        allow read: if isSignedIn();
         allow update: if isSignedIn() && request.auth.uid == userId;
-        allow delete: if false;
+        // Allow owner to delete members (except other owners)
+        allow delete: if isOwner(platformId);
+      }
+
+      // Membership Types (tiers/plans)
+      match /membershipTypes/{typeId} {
+        // Allow read for any signed-in user (to see membership types before joining)
+        allow read: if isSignedIn();
+        allow create, update, delete: if isOwner(platformId);
       }
       
       // Payments
