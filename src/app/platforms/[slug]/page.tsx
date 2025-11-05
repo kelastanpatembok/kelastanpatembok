@@ -16,15 +16,21 @@ import { EmptyState } from "@/components/empty-state";
 import { JumpToTop } from "@/components/jump-to-top";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Loader2, Settings } from "lucide-react";
+import { BookOpen, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function PlatformHomePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = reactUse(params);
+  const router = useRouter();
   const [platform, setPlatform] = useState<any>(null);
   const { user, loginWithGoogle } = useAuth();
   const [joining, setJoining] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [posts, setPosts] = useState<any[]>([]);
   const [communities, setCommunities] = useState<any[]>([]);
@@ -537,6 +543,22 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
     setSelectedFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
   }
 
+  async function handleDeletePlatform() {
+    if (!platform) return;
+    
+    setDeleting(true);
+    try {
+      await deleteDoc(doc(db, "platforms", platform.id));
+      toast.success("Platform deleted successfully");
+      setDeleteDialogOpen(false);
+      router.push("/platforms");
+    } catch (error: any) {
+      console.error("Failed to delete platform", error);
+      toast.error("Failed to delete platform: " + (error?.message || "Unknown error"));
+      setDeleting(false);
+    }
+  }
+
   // Fetch latest avatars for authors shown (up to 10 per batch)
   useEffect(() => {
     // Run regardless of platform presence; safely no-op if list empty
@@ -735,33 +757,68 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
     <div className="space-y-6">
       {/* Platform Description */}
       {platform && platform.description && (
-        <div className="rounded-lg border bg-card p-4">
-          <div className="flex items-start justify-between gap-4">
-            <p className="text-sm text-muted-foreground leading-relaxed flex-1">
-              {platform.description}
-            </p>
-            {isOwner && (
-              <Button asChild variant="outline" size="sm" className="shrink-0">
-                <Link href={`/platforms/${slug}/edit`}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Edit Platform
-                </Link>
-              </Button>
-            )}
-          </div>
+        <div className="relative rounded-lg border bg-card p-4">
+          {isOwner && (
+            <div className="absolute top-1 right-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={`/platforms/${slug}/edit`}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit Platform
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => setDeleteDialogOpen(true)} 
+                    variant="destructive"
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Platform
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground leading-relaxed pr-6">
+            {platform.description}
+          </p>
         </div>
       )}
-      {/* Platform Description Empty but owner can edit */}
-      {platform && !platform.description && isOwner && (
-        <div className="rounded-lg border bg-card p-4">
-          <div className="flex items-center justify-end">
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/platforms/${slug}/edit`}>
-                <Settings className="h-4 w-4 mr-2" />
-                Edit Platform
-              </Link>
-            </Button>
-          </div>
+
+      {/* If no description but owner, show menu separately */}
+      {!platform?.description && isOwner && (
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                <MoreVertical className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/platforms/${slug}/edit`}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit Platform
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => setDeleteDialogOpen(true)} 
+                variant="destructive"
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Platform
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 
@@ -863,6 +920,41 @@ export default function PlatformHomePage({ params }: { params: Promise<{ slug: s
       {!loading && !hasMore && filteredPosts.length > 0 && (
         <div className="py-8 text-center text-sm text-muted-foreground">You've reached the end of the feed</div>
       )}
+
+      {/* Delete Platform Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Platform</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{platform?.name || "this platform"}"? This action cannot be undone and will permanently delete all associated data including posts, communities, and courses.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeletePlatform}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Platform"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <JumpToTop />
     </div>

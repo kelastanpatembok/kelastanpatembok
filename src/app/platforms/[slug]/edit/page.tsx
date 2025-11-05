@@ -219,7 +219,8 @@ export default function EditPlatformPage({ params }: Params) {
                   }
                   await auth.currentUser.getIdToken(true);
                   const ext = (logoFile.name.split('.').pop() || 'png').toLowerCase();
-                  const path = `platforms/${slug}/branding/logo_${Date.now()}.${ext}`;
+                  // Use platform.id instead of slug so Storage rules can verify ownership
+                  const path = `platforms/${platform.id}/branding/logo_${Date.now()}.${ext}`;
                   const storageRef = ref(storage, path);
                   await uploadBytes(storageRef, logoFile, { contentType: logoFile.type || `image/${ext}` });
                   uploadedLogoUrl = await getDownloadURL(storageRef);

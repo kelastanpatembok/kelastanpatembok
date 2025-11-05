@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,11 +18,12 @@ export default function HomeLanding() {
       try {
         let platformsData: any[] = [];
         try {
-          const snap = await getDocs(query(collection(db, "platforms"), orderBy("createdAt", "desc")));
+          // Only show platforms with public: true
+          const snap = await getDocs(query(collection(db, "platforms"), where("public", "==", true), orderBy("createdAt", "desc")));
           platformsData = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
         } catch {
-          // Fallback if createdAt doesn't exist or ordering fails
-          const snap = await getDocs(query(collection(db, "platforms")));
+          // Fallback if createdAt doesn't exist or ordering fails - still filter by public
+          const snap = await getDocs(query(collection(db, "platforms"), where("public", "==", true)));
           platformsData = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
         }
         setPlatforms(platformsData);

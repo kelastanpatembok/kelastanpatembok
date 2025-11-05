@@ -195,40 +195,40 @@ function ToolbarPlugin() {
   }, [editor]);
 
   return (
-    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/50 mb-2">
+    <div className="flex items-center gap-0.5 md:gap-2 p-1 md:p-2 border rounded-md bg-muted/50 mb-2 overflow-x-auto">
       <Button 
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 w-8 p-0" 
+        className="h-6 w-6 md:h-8 md:w-8 p-0 shrink-0" 
         onMouseDown={(e) => { e.preventDefault(); handleFormat("bold"); }}
       >
-        <Bold className="h-4 w-4" />
+        <Bold className="h-3 w-3 md:h-4 md:w-4" />
       </Button>
       <Button 
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 w-8 p-0" 
+        className="h-6 w-6 md:h-8 md:w-8 p-0 shrink-0" 
         onMouseDown={(e) => { e.preventDefault(); handleFormat("italic"); }}
       >
-        <Italic className="h-4 w-4" />
+        <Italic className="h-3 w-3 md:h-4 md:w-4" />
       </Button>
       <Button 
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 w-8 p-0" 
+        className="h-6 w-6 md:h-8 md:w-8 p-0 shrink-0" 
         onMouseDown={(e) => { e.preventDefault(); handleFormat("underline"); }}
       >
-        <Underline className="h-4 w-4" />
+        <Underline className="h-3 w-3 md:h-4 md:w-4" />
       </Button>
-      <div className="w-px h-6 bg-border" />
+      <div className="w-px h-4 md:h-6 bg-border shrink-0" />
       <Button 
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 px-2" 
+        className="h-6 px-1 md:h-8 md:px-2 shrink-0 text-[10px] md:text-sm" 
         onMouseDown={(e) => { e.preventDefault(); handleHeading("h1"); }}
       >
         H1
@@ -237,7 +237,7 @@ function ToolbarPlugin() {
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 px-2" 
+        className="h-6 px-1 md:h-8 md:px-2 shrink-0 text-[10px] md:text-sm" 
         onMouseDown={(e) => { e.preventDefault(); handleHeading("h2"); }}
       >
         H2
@@ -246,19 +246,19 @@ function ToolbarPlugin() {
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 w-8 p-0" 
+        className="h-6 w-6 md:h-8 md:w-8 p-0 shrink-0" 
         onMouseDown={(e) => { e.preventDefault(); handleList("unordered"); }}
       >
-        <ListIcon className="h-4 w-4" />
+        <ListIcon className="h-3 w-3 md:h-4 md:w-4" />
       </Button>
       <Button 
         type="button" 
         variant="ghost" 
         size="sm" 
-        className="h-8 w-8 p-0" 
+        className="h-6 w-6 md:h-8 md:w-8 p-0 shrink-0" 
         onMouseDown={(e) => { e.preventDefault(); handleList("ordered"); }}
       >
-        <ListOrdered className="h-4 w-4" />
+        <ListOrdered className="h-3 w-3 md:h-4 md:w-4" />
       </Button>
     </div>
   );

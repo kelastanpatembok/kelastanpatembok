@@ -106,7 +106,7 @@ export function FeedComposer({ onAddPost }: FeedComposerProps) {
   if (!allowed) return null;
 
   return (
-    <div className="rounded-xl border p-4 space-y-4">
+    <div className="rounded-xl border p-3 md:p-4 space-y-3 md:space-y-4">
       <div className="space-y-2">
         <KtdLexicalEditor
           key={editorKey}
@@ -118,7 +118,7 @@ export function FeedComposer({ onAddPost }: FeedComposerProps) {
       </div>
       
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0.5 md:gap-2 overflow-x-auto flex-1 min-w-0 -mx-1 px-1">
           <input
             ref={fileInputRef}
             type="file"
@@ -130,13 +130,26 @@ export function FeedComposer({ onAddPost }: FeedComposerProps) {
               setImagePreview(f ? URL.createObjectURL(f) : "");
             }}
           />
-          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-            <ImageIcon className="h-4 w-4 mr-2" />
-            {imageFile ? "Change image" : "Attach image"}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => fileInputRef.current?.click()}
+            className="shrink-0 h-7 w-7 md:h-auto md:w-auto md:px-3 p-0"
+            title={imageFile ? "Change image" : "Attach image"}
+          >
+            <ImageIcon className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2" />
+            <span className="hidden md:inline">{imageFile ? "Change image" : "Attach image"}</span>
           </Button>
           {imageFile && (
-            <Button variant="ghost" size="sm" onClick={()=>{ setImageFile(null); setImagePreview(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}>
-              Remove
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={()=>{ setImageFile(null); setImagePreview(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+              className="shrink-0 h-7 w-7 md:h-auto md:w-auto md:px-3 p-0"
+              title="Remove image"
+            >
+              <X className="h-3.5 w-3.5 md:h-4 md:w-4 md:ml-2" />
+              <span className="hidden md:inline ml-2">Remove</span>
             </Button>
           )}
           <Button 
@@ -146,20 +159,24 @@ export function FeedComposer({ onAddPost }: FeedComposerProps) {
               setIsEventPost(!isEventPost);
               setPolls([]);
             }}
+            className="shrink-0 h-7 w-7 md:h-auto md:w-auto md:px-3 p-0"
+            title={isEventPost ? "Event" : "Create Event"}
           >
-            <CalendarCheck className="h-4 w-4 mr-2" />
-            {isEventPost ? "Event" : "Create Event"}
+            <CalendarCheck className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2" />
+            <span className="hidden md:inline">{isEventPost ? "Event" : "Create Event"}</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={addPoll}
+            className="shrink-0 h-7 w-7 md:h-auto md:w-auto md:px-3 p-0"
+            title="Add Question"
           >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Add Question
+            <BarChart3 className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Question</span>
           </Button>
         </div>
-        <LoadingButton onClick={handlePost} disabled={!canPost} loading={loading}>
+        <LoadingButton onClick={handlePost} disabled={!canPost} loading={loading} className="shrink-0">
           Post
         </LoadingButton>
       </div>

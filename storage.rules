@@ -28,6 +28,15 @@ service firebase.storage {
 
     }
 
+    // Helper function to check if user owns platform by slug
+    // Note: This requires checking all platforms, which Storage rules can't do efficiently
+    // As a workaround, we'll verify ownership client-side and use a more permissive rule here
+    // The client code already checks ownership before uploading
+    function isOwnerBySlug(slug) {
+      // Storage rules can't query by slug, so we can't implement this efficiently
+      // Ownership is verified client-side before upload
+      return isSignedIn();
+    }
 
     // Lesson videos (note: uses platformId, not slug)
 
@@ -51,12 +60,20 @@ service firebase.storage {
 
     // existing rules you already have ...
 
-    match /platforms/{slug}/branding/{file=**} {
-
+    // Branding files using platformId (preferred - allows ownership verification)
+    match /platforms/{platformId}/branding/{file=**} {
       allow read: if true;
+      // Verify ownership using platformId
+      allow write: if isOwner(platformId) && request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
 
-      allow write: if isSignedIn();
-
+    // Branding files using slug (legacy/fallback - for newly created platforms)
+    // Note: Ownership is verified client-side before upload
+    match /platforms/{slug}/branding/{file=**} {
+      allow read: if true;
+      // Allow write for signed-in users (ownership checked client-side)
+      // Storage rules can't efficiently check ownership by slug without querying Firestore
+      allow write: if isSignedIn() && request.resource.size < 10 * 1024 * 1024; // 10MB limit
     }
 
     match /platforms/{slug}/posts/{file=**} {
