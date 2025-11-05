@@ -60,7 +60,7 @@ export default function EditMembershipTypePage({ params }: { params: Promise<{ s
           const typeDocRef = doc(db, "platforms", p.id, "membershipTypes", typeId);
           const typeSnap = await getDoc(typeDocRef);
           if (typeSnap.exists()) {
-            const typeData = { id: typeSnap.id, ...typeSnap.data() };
+            const typeData = { id: typeSnap.id, ...typeSnap.data() } as any;
             setMembershipType(typeData);
             setTypeName(typeData.name || "");
             setTypeIcon(typeData.icon || "");
